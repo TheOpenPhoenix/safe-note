@@ -1,0 +1,20 @@
+name = "safenote"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "safenote"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[observability]
+enabled = false
+
+[vars]
+ACCESS_TEAM_DOMAIN = "yourteam.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE_WITH_APPLICATION_AUD_TAG"
