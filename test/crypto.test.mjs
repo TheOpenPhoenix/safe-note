@@ -12,7 +12,10 @@ test('passphrase and recovery key both unlock; wrong ones fail', async () => {
   assert.deepEqual(await C.decryptNote(viaPass, 'abc12345', enc), { title: 'hi' });
   assert.deepEqual(await C.decryptNote(viaRec, 'abc12345', enc), { title: 'hi' });
   await assert.rejects(C.unlockWithPassphrase(blob, 'wrong'), /Wrong passphrase/);
-  await assert.rejects(C.unlockWithRecoveryKey(blob, 'AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA'), /Wrong recovery key|wrong length/);
+  await assert.rejects(
+    C.unlockWithRecoveryKey(blob, 'AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA-AAAA'),
+    /Wrong recovery key|wrong length/,
+  );
 });
 
 test('unwrapped data key is not extractable', async () => {
@@ -36,7 +39,8 @@ test('unicode round trip and tamper detection', async () => {
   const n = { title: 'Zażółć 🔐', body: '日本語' };
   const e = await C.encryptNote(dek, 'uni-12345', n);
   assert.deepEqual(await C.decryptNote(dek, 'uni-12345', e), n);
-  const raw = C.unb64(e.ct); raw[5] ^= 1;
+  const raw = C.unb64(e.ct);
+  raw[5] ^= 1;
   await assert.rejects(C.decryptNote(dek, 'uni-12345', { iv: e.iv, ct: C.b64(raw) }));
 });
 
@@ -45,8 +49,13 @@ test('change passphrase keeps notes readable; recovery key still works', async (
   const e = await C.encryptNote(dek, 'chg-12345', { t: 1 });
   const blob2 = await C.rewrapPassphrase(blob, { passphrase: 'old-old-old-old' }, 'new-new-new-new', FAST);
   await assert.rejects(C.unlockWithPassphrase(blob2, 'old-old-old-old'));
-  assert.deepEqual(await C.decryptNote(await C.unlockWithPassphrase(blob2, 'new-new-new-new'), 'chg-12345', e), { t: 1 });
-  assert.deepEqual(await C.decryptNote(await C.unlockWithRecoveryKey(blob2, recoveryKey), 'chg-12345', e), { t: 1 });
+  assert.deepEqual(
+    await C.decryptNote(await C.unlockWithPassphrase(blob2, 'new-new-new-new'), 'chg-12345', e),
+    { t: 1 },
+  );
+  assert.deepEqual(await C.decryptNote(await C.unlockWithRecoveryKey(blob2, recoveryKey), 'chg-12345', e), {
+    t: 1,
+  });
   await assert.rejects(C.rewrapPassphrase(blob, { passphrase: 'nope' }, 'x', FAST));
 });
 

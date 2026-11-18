@@ -116,8 +116,20 @@ and **Export decrypted notes** (plain JSON; handle with care). Importing a backu
 ## Layout
 
 ```
-public/       static client: index.html, app.js (UI + sync), crypto.js (all cryptography), markdown.js (renderer), style.css
+public/       static client (plain ES modules, no build step)
+  app.js        entry point
+  auth.js       setup, unlock and recovery-key screens
+  session.js    start, auto-lock and lock
+  sync.js       pull/push of encrypted notes and settings
+  state.js      in-memory state (nothing is persisted)
+  notes-view.js sidebar, search and note grid
+  editor.js     note editor; editor-text.js has its Markdown text helpers
+  settings.js   settings screen
+  dom.js, api.js  DOM helpers and fetch wrapper
+  crypto.js     all cryptography
+  markdown.js   safe Markdown renderer
+  style.css
 src/worker.js API: Access JWT check, HMAC owner, notes sync
 schema.sql    D1 tables
-test/         crypto, markdown and Worker API tests (node --test)
+test/         crypto, markdown, editor-helper and Worker API tests (node --test)
 ```
