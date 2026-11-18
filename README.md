@@ -54,25 +54,24 @@ learn of the deletion. There are no timestamps, names, emails or IPs in the sche
 
 ## Deploy on a free Cloudflare account
 
-You need a Cloudflare account, Node 20+, and (for Access) a Zero Trust organisation, which has a free plan for up to
-50 users. Cloudflare may ask for a payment method when you first set up Zero Trust, even on the free plan.
+You need a Cloudflare account and a Zero Trust organisation, which has a free plan for up to 50 users. Cloudflare may
+ask for a payment method when you first set up Zero Trust, even on the free plan. Nothing private is committed: the
+database id and Access values live in Cloudflare, and `scripts/deploy.mjs` fills them in at build time.
 
-```bash
-git clone <this repo> safenote && cd safenote
-npm install
+**1. Create the database** in the dashboard (Storage and databases, then D1, then Create) or with
+`npx wrangler d1 create safenote`, and copy its database id.
 
-# 1. Create the database and put its id into wrangler.toml
-npx wrangler d1 create safenote          # copy database_id into wrangler.toml
-npm run db:init                          # creates the tables
+**2. Connect the repo.** Workers and Pages, Create, Import a repository, pick this repo. Set:
+- Build command: leave empty
+- Deploy command: `npm run deploy`
+- Build variables (Settings, Build, Variables and secrets): `D1_DATABASE_ID`, `ACCESS_TEAM_DOMAIN`
+  (`yourteam.cloudflareaccess.com`) and `ACCESS_AUD` (from step 4).
 
-# 2. Secret used to turn Access user ids into owner fingerprints.
-#    BACK THIS UP. If you lose or change it, existing vaults become unreachable.
-openssl rand -hex 32                     # copy the output somewhere safe (password manager)
-npx wrangler secret put OWNER_SECRET     # paste it when asked
+The first build will fail until step 4 gives you the AUD tag. That is expected; add it and retry the build.
 
-# 3. Deploy once to get your URL
-npm run deploy
-```
+**3. Set the owner secret.** Worker settings, Variables and secrets, add a **Secret** named `OWNER_SECRET`. Generate it
+with `openssl rand -hex 32` and **back it up** in a password manager. If you lose or change it, existing vaults become
+unreachable. Secrets are kept across deploys.
 
 **4. Put Cloudflare Access in front of it.** In the Cloudflare dashboard:
 1. Zero Trust, then Access, then Applications, then Add an application, then Self-hosted.
@@ -80,10 +79,11 @@ npm run deploy
    login method you want (for example "Emails: you@example.com"). Add other people here to give them a vault.
 3. Open the application and copy its **Application Audience (AUD) Tag**. Your team domain
    (`yourteam.cloudflareaccess.com`) is shown under Zero Trust settings.
-4. Put both in `wrangler.toml` as `ACCESS_AUD` and `ACCESS_TEAM_DOMAIN`, then run `npm run deploy` again.
+4. Add both as build variables from step 2 and retry the build.
 
-The Worker refuses every API call that doesn't carry a valid Access token for your application, so a missing or
-wrong setup fails closed.
+Every push to the production branch now applies `schema.sql` (it only uses `IF NOT EXISTS`) and deploys. The Worker
+refuses every API call that doesn't carry a valid Access token for your application, so a missing or wrong setup fails
+closed.
 
 **5. Leave Worker logs off.** `wrangler.toml` sets `observability.enabled = false`. Don't turn on Workers Logs or Logpush
 if you want minimal retention.

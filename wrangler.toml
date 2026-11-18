@@ -14,7 +14,3 @@ database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
 
 [observability]
 enabled = false
-
-[vars]
-ACCESS_TEAM_DOMAIN = "yourteam.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE_WITH_APPLICATION_AUD_TAG"
