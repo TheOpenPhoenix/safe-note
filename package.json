@@ -7,7 +7,11 @@
     "deploy": "wrangler deploy",
     "db:init": "wrangler d1 execute safenote --remote --file=schema.sql",
     "db:init:local": "wrangler d1 execute safenote --local --file=schema.sql",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "format": "prettier --write \"public/*.js\" \"src/*.js\" \"test/*.mjs\" public/style.css"
   },
-  "devDependencies": { "wrangler": "^4" }
+  "devDependencies": {
+    "wrangler": "^4",
+    "prettier": "^3"
+  }
 }

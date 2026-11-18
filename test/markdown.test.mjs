@@ -13,10 +13,17 @@ test('headings, paragraphs, hr, line breaks', () => {
 
 test('inline formatting', () => {
   const k = parseInline('a **b** *c* ~~d~~ `e` _f_');
-  assert.deepEqual(types(k).filter((t) => t !== 'text'), ['strong', 'em', 'del', 'code', 'em']);
+  assert.deepEqual(
+    types(k).filter((t) => t !== 'text'),
+    ['strong', 'em', 'del', 'code', 'em'],
+  );
   assert.equal(parseInline('snake_case_word')[0].t, 'text', 'underscores inside words are not emphasis');
   assert.equal(parseInline('2 * 3 * 4')[0].t, 'text');
-  assert.equal(parseInline('window.__xss=1 and __init__.py')[0].t, 'text', 'double underscores inside words are literal');
+  assert.equal(
+    parseInline('window.__xss=1 and __init__.py')[0].t,
+    'text',
+    'double underscores inside words are literal',
+  );
   assert.equal(parseInline('__bold__')[0].t, 'strong');
 });
 
@@ -30,7 +37,10 @@ test('links: only http, https, mailto; no javascript:', () => {
   const bad = parseInline('[x](javascript:alert(1))');
   assert.ok(bad.every((n) => n.t !== 'link'));
   const good = parseInline('see [docs](https://example.com) and https://example.org/x.');
-  assert.deepEqual(good.filter((n) => n.t === 'link').map((n) => n.href), ['https://example.com', 'https://example.org/x']);
+  assert.deepEqual(
+    good.filter((n) => n.t === 'link').map((n) => n.href),
+    ['https://example.com', 'https://example.org/x'],
+  );
 });
 
 test('raw HTML stays text', () => {
@@ -46,7 +56,10 @@ test('lists: unordered, ordered, nested, tasks', () => {
   assert.equal(ast[0].items[1].kids[0].t, 'list');
   assert.equal(ast[0].items[1].kids[0].items.length, 2);
   assert.equal(ast[1].ordered, true);
-  assert.deepEqual(ast[2].items.map((i) => i.task), [false, true]);
+  assert.deepEqual(
+    ast[2].items.map((i) => i.task),
+    [false, true],
+  );
 });
 
 test('task toggling edits the right source line, including nested', () => {
@@ -98,5 +111,9 @@ test('spoiler labels', () => {
   assert.equal(k[1].raw, 'hunter2');
   assert.equal(k[2].text, ' done');
   assert.equal(parseInline('||x||')[0].label, null);
-  assert.equal(parseInline('||x|| {not a label}')[0].label, null, 'a space before braces means it is plain text');
+  assert.equal(
+    parseInline('||x|| {not a label}')[0].label,
+    null,
+    'a space before braces means it is plain text',
+  );
 });
