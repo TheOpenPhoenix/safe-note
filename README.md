@@ -52,6 +52,25 @@ old one.
 `notes`: `owner`, random `id`, `seq`, `iv`, `ct`. Deleted notes keep an empty tombstone row so other devices
 learn of the deletion. There are no timestamps, names, emails or IPs in the schema. See [schema.sql](schema.sql).
 
+## One command setup
+
+Create an API token at dash.cloudflare.com/profile/api-tokens with these permissions: Account, Workers Scripts, Edit;
+Account, D1, Edit; Account, Access: Apps and Policies, Edit; Account, Access: Organizations, Identity Providers, and
+Groups, Read. Then:
+
+```bash
+npm install
+export CLOUDFLARE_API_TOKEN=...
+export CLOUDFLARE_ACCOUNT_ID=...
+export ALLOWED_EMAIL=you@example.com
+npm run setup
+```
+
+It creates the database, deploys, generates and stores `OWNER_SECRET` (printed once, back it up), creates the Access
+application for your email and redeploys with the right values. Running it again is safe. Zero Trust must already be
+enabled on the account. Nothing is written to the repo. The manual steps below do the same thing by hand and set up
+automatic deploys on push.
+
 ## Deploy on a free Cloudflare account
 
 You need a Cloudflare account and a Zero Trust organisation, which has a free plan for up to 50 users. Cloudflare may

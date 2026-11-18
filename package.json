@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
+    "setup": "node scripts/setup.mjs",
     "deploy": "node scripts/deploy.mjs",
     "db:init": "wrangler d1 execute safenote --remote --file=schema.sql",
     "db:init:local": "wrangler d1 execute safenote --local --file=schema.sql",
